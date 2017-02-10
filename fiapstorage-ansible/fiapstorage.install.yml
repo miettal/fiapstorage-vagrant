@@ -1,0 +1,24 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - user:
+        name: gutp
+        shell: /bin/bash
+        groups: sudo
+        password: "$6$rounds=656000$hfReh59AVthAMdOm$yxJqTlZHWmCkk2gtRSpM2e6ZNTjA3fqmvjyYhqMvGImQkgvlw6GpzgoaSHV9l8emUp5crGKMB8DDrZR22VtWG0" #gutp
+        update_password: on_create
+    - apt: name=openjdk-7-jdk
+    - apt: name=apache2
+    - apt: name=tomcat7
+    - apt: name=tomcat7-admin
+    - get_url:
+        url: 'http://archive.apache.org/dist/axis/axis2/java/core/1.6.2/axis2-1.6.2-war.zip'
+        dest: '/home/gutp'
+        owner: 'gutp'
+    - command: unzip axis2-1.6.2-war.zip
+        chdir: /home/gutp/
+    - copy:
+        src: /home/gutp/axis2.war
+        dest: /var/lib/tomcat7/webapps/
+    - service: name=tomcat7 state=restarted
