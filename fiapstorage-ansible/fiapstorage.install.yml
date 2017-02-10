@@ -12,7 +12,7 @@
     - apt: name=apache2
     - apt: name=tomcat7
     - apt: name=tomcat7-admin
-    - apt: name=postgresql-9.1
+    - apt: name=postgresql-9.3
     - get_url:
         url: 'http://archive.apache.org/dist/axis/axis2/java/core/1.6.2/axis2-1.6.2-war.zip'
         dest: /home/gutp/
