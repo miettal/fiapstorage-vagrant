@@ -18,6 +18,7 @@
         dest: /home/gutp/
         owner: 'gutp'
     - command: unzip axis2-1.6.2-war.zip
+      args:
         chdir: /home/gutp/
     - copy:
         src: /home/gutp/axis2.war
