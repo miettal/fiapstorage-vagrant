@@ -1,5 +1,5 @@
 # fiapstorage-vagrant
-     sudo apt-get install vagrant ansible
+    sudo apt-get install vagrant ansible
     vagrant plugin install vagrant-vbguest
     git clone --recursive git@github.com:miettal/fiapstorage-vagrant.git
     cd fiapstorage-vagrant
