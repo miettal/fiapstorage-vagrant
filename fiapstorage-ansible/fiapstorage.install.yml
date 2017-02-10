@@ -12,6 +12,7 @@
     - apt: name=apache2
     - apt: name=tomcat7
     - apt: name=tomcat7-admin
+    - apt: name=postgresql-9.1
     - get_url:
         url: 'http://archive.apache.org/dist/axis/axis2/java/core/1.6.2/axis2-1.6.2-war.zip'
         dest: '/home/gutp'
@@ -21,4 +22,13 @@
     - copy:
         src: /home/gutp/axis2.war
         dest: /var/lib/tomcat7/webapps/
+    - command: a2enmod proxy proxy_ajp
+    - lineinfile:
+        dest: '/etc/apache2/httpd.conf'
+        regexp: 'ajp://localhost:8009'
+        line: '<Location /axis2/>ProxyPass ajp://localhost:8009/axis2/</Location> # added by ansible'
+    - lineinfile:
+        dest: 'sudo vim /etc/tomcat7/server.xml'
+        regexp: 'ajp connector'
+        line: '<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" /> <!-- added by ansible for ajp connector -->'
     - service: name=tomcat7 state=restarted
