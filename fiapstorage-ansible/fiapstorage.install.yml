@@ -59,7 +59,7 @@
 #apache
     - debug: msg='Install apache'
     - apt: name=apache2
-    - pause: seconds=10
+    - pause: seconds=30
     - uri:
         url: http://localhost/
 #tomcat
@@ -67,7 +67,7 @@
     - apt: name=openjdk-7-jdk
     - apt: name=tomcat7
     - apt: name=tomcat7-admin
-    - pause: seconds=10
+    - pause: seconds=30
     - uri:
         url: http://localhost:8080/
 #axis2
@@ -76,14 +76,14 @@
         src: /home/gutp/axis2-1.6.2/axis2.war
         dest: /var/lib/tomcat7/webapps/
     - service: name=tomcat7 state=restarted
-    - pause: seconds=10
+    - pause: seconds=30
     - copy:
         src: files/web.xml
         dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/web.xml
         owner: 'tomcat7'
         group: 'tomcat7'
     - service: name=tomcat7 state=restarted
-    - pause: seconds=10
+    - pause: seconds=30
     - uri:
         url: http://localhost:8080/axis2/
 #ajp connector
@@ -101,7 +101,7 @@
         group: 'tomcat7'
     - service: name=tomcat7 state=restarted
     - service: name=apache2 state=restarted
-    - pause: seconds=10
+    - pause: seconds=30
     - uri:
         url: http://localhost/axis2/
 #postgresql
