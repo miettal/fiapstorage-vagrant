@@ -70,6 +70,13 @@
         dest: /var/lib/tomcat7/webapps/
     - service: name=tomcat7 state=restarted
     - pause: seconds=10
+    - copy:
+        src: files/web.xml
+        dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/web.xml
+        owner: 'tomcat7'
+        group: 'tomcat7'
+    - service: name=tomcat7 state=restarted
+    - pause: seconds=10
     - uri:
         url: http://localhost:8080/axis2/
 #ajp connector
