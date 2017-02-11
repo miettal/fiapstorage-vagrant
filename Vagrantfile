@@ -4,10 +4,10 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
 
-  config.vm.network :forwarded_port, host: 8000, guest: 8080
+  config.vm.network :forwarded_port, host: 8000, guest: 80
 
   config.vm.provider "virtualbox" do |vm|
-    vm.name = "gijilog-vagrant"
+    vm.name = "fiapstorage-vagrant"
     vm.customize ["modifyvm", :id, "--memory", "1024"]
   end
 
