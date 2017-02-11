@@ -49,6 +49,13 @@
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
+# disable password authentication
+    - lineinfile:
+        dest: '/etc/ssh/sshd_config'
+        regexp: '^#?\s*PasswordAuthentication\s+(yes|no)'
+        backrefs: yes
+        line: 'PasswordAuthentication no'
+    - service: name=ssh state=restarted
 #apache
     - debug: msg='Install apache'
     - apt: name=apache2
