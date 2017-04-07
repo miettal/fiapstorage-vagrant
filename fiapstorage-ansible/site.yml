@@ -12,34 +12,34 @@
     - debug: msg='Download'
     - name: download axis2
       get_url:
-        url: 'http://archive.apache.org/dist/axis/axis2/java/core/1.6.2/axis2-1.6.2-war.zip'
+        url: 'http://ftp.jaist.ac.jp/pub/apache/axis/axis2/java/core/1.7.4/axis2-1.7.4-war.zip'
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
     - file:
-        path: /home/gutp/axis2-1.6.2
+        path: /home/gutp/axis2-1.7.4
         state: directory
         owner: 'gutp'
         group: 'gutp'
     - unarchive:
-        src: /home/gutp/axis2-1.6.2-war.zip
-        dest: /home/gutp/axis2-1.6.2
+        src: /home/gutp/axis2-1.7.4-war.zip
+        dest: /home/gutp/axis2-1.7.4
         owner: 'gutp'
         group: 'gutp'
     - name: download postgresql jdbc driver
       get_url:
-        url: 'https://jdbc.postgresql.org/download/postgresql-9.3-1104.jdbc4.jar'
+        url: 'https://jdbc.postgresql.org/download/postgresql-9.4.1208.jar'
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
     - name: download fiapstorage2
       get_url:
-        url: 'http://fiap-dev.gutp.ic.i.u-tokyo.ac.jp/dist/FIAPStorage2-20131011.zip'
+        url: 'https://www.taisyo.hongo.wide.ad.jp/gutp/FIAPStorage2-20170406.zip'
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
     - unarchive:
-        src: /home/gutp/FIAPStorage2-20131011.zip
+        src: /home/gutp/FIAPStorage2-20170406.zip
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
@@ -59,33 +59,23 @@
 #apache
     - debug: msg='Install apache'
     - apt: name=apache2
-    - pause: seconds=30
-    - uri:
-        url: http://localhost/
 #tomcat
     - debug: msg='Install tomcat'
-    - apt: name=openjdk-7-jdk
+    - apt: name=openjdk-8-jdk
     - apt: name=tomcat7
     - apt: name=tomcat7-admin
-    - pause: seconds=30
-    - uri:
-        url: http://localhost:8080/
 #axis2
     - debug: msg='Install axis2'
     - copy:
-        src: /home/gutp/axis2-1.6.2/axis2.war
+        src: /home/gutp/axis2-1.7.4/axis2.war
         dest: /var/lib/tomcat7/webapps/
     - service: name=tomcat7 state=restarted
-    - pause: seconds=30
     - copy:
         src: files/web.xml
         dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/web.xml
         owner: 'tomcat7'
         group: 'tomcat7'
     - service: name=tomcat7 state=restarted
-    - pause: seconds=30
-    - uri:
-        url: http://localhost:8080/axis2/
 #ajp connector
     - debug: msg='Install and Configure ajp connector'
     - command: a2enmod proxy proxy_ajp
@@ -101,33 +91,32 @@
         group: 'tomcat7'
     - service: name=tomcat7 state=restarted
     - service: name=apache2 state=restarted
-    - pause: seconds=30
-    - uri:
-        url: http://localhost/axis2/
 #postgresql
     - debug: msg='Install and Configure postgresql'
-    - apt: name=postgresql-9.3
+    - apt: name=postgresql-9.5
     - copy:
-        src: /home/gutp/postgresql-9.3-1104.jdbc4.jar
+        src: /home/gutp/postgresql-9.4.1208.jar
         dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/lib/
         owner: 'root'
         group: 'root'
     - copy:
         src: files/pg_hba.conf
-        dest: /etc/postgresql/9.3/main/pg_hba.conf
+        dest: /etc/postgresql/9.5/main/pg_hba.conf
         owner: 'postgres'
         group: 'postgres'
     - copy:
         src: files/postgresql.conf
-        dest: /etc/postgresql/9.3/main/postgresql.conf
+        dest: /etc/postgresql/9.5/main/postgresql.conf
         owner: 'postgres'
         group: 'postgres'
     - service: name=postgresql state=restarted
+    - service: name=tomcat7 state=restarted
 #fiapstorage2
     - debug: msg='Install and Configure fiapstorage2'
     - command: createdb fiapstorage2
       become: true
       become_user: postgres
+      ignore_errors: True
     - command: psql fiapstorage2 -f /home/gutp/FIAPStorage2/fiapstorage2.sql
       become: true
       become_user: postgres
@@ -137,7 +126,7 @@
         owner: tomcat7
         group: nogroup
     - copy:
-        src: /home/gutp/FIAPStorage2/FIAPStorage2-20131011.aar
+        src: /home/gutp/FIAPStorage2/FIAPStorage2-20170406.aar
         dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/services/
         owner: 'root'
         group: 'root'
@@ -152,9 +141,11 @@
         group: 'root'
 #fiapstorage2 admin
     - debug: msg='Install and Configure fiapstorage2 admin'
-    - apt: name=php5
-    - apt: name=php5-gd
-    - apt: name=php5-pgsql
+    - apt: name=php
+    - apt: name=php-gd
+    - apt: name=php-soap
+    - apt: name=php-pgsql
+    - apt: name=libapache2-mod-php
     - file:
         state: absent
         path: /var/www/html/index.html
@@ -170,6 +161,42 @@
         group: 'root'
     - replace:
         dest: /var/www/html/archive_view.php
-        regexp: 'jpgraph-3.0.7'
+        regexp: 'jpgraph-4.0.0'
         replace: 'jpgraph-4.0.2'
     - service: name=apache2 state=restarted
+#FIAPDummyDataGenerator
+    - debug: msg='Install FIAPDummyDataGenerator'
+    - copy:
+        src: files/dummy
+        dest: /usr/local/
+        owner: 'root'
+        group: 'root'
+    - file:
+        path: /usr/local/dummy/FIAPDummyDataGeneratorWatchDog.sh
+        mode: 0755
+    - cron:
+        name: "exec FIAPDummyDataGenerator"
+        job: "/usr/local/dummy/FIAPDummyDataGeneratorWatchDog.sh"
+#SamplePHPCodes
+    - debug: msg='Install SamplePHPCodes'
+    - copy:
+        src: files/SamplePHPCodes
+        dest: /home/gutp/
+        owner: 'gutp'
+        group: 'gutp'
+#FIAPSimpleTester
+    - get_url:
+        url: 'http://fiap-develop.gutp.ic.i.u-tokyo.ac.jp/dist/FIAPSimpleTester-201205.zip'
+        dest: /home/gutp/
+        owner: 'gutp'
+        group: 'gutp'
+    - file:
+        path: /home/gutp/FIAPSimpleTester-201205
+        state: directory
+        owner: 'gutp'
+        group: 'gutp'
+    - unarchive:
+        src: /home/gutp/FIAPSimpleTester-201205.zip
+        dest: /home/gutp/FIAPSimpleTester-201205/
+        owner: 'gutp'
+        group: 'gutp'
