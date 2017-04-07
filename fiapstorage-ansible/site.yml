@@ -34,12 +34,12 @@
         group: 'gutp'
     - name: download fiapstorage2
       get_url:
-        url: 'https://www.taisyo.hongo.wide.ad.jp/gutp/FIAPStorage2-20161101.zip'
+        url: 'https://www.taisyo.hongo.wide.ad.jp/gutp/FIAPStorage2-20170406.zip'
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
     - unarchive:
-        src: /home/gutp/FIAPStorage2-20161101.zip
+        src: /home/gutp/FIAPStorage2-20170406.zip
         dest: /home/gutp/
         owner: 'gutp'
         group: 'gutp'
@@ -110,6 +110,7 @@
         owner: 'postgres'
         group: 'postgres'
     - service: name=postgresql state=restarted
+    - service: name=tomcat7 state=restarted
 #fiapstorage2
     - debug: msg='Install and Configure fiapstorage2'
     - command: createdb fiapstorage2
@@ -125,7 +126,7 @@
         owner: tomcat7
         group: nogroup
     - copy:
-        src: /home/gutp/FIAPStorage2/FIAPStorage2-20161101.aar
+        src: /home/gutp/FIAPStorage2/FIAPStorage2-20170406.aar
         dest: /var/lib/tomcat7/webapps/axis2/WEB-INF/services/
         owner: 'root'
         group: 'root'
@@ -140,10 +141,10 @@
         group: 'root'
 #fiapstorage2 admin
     - debug: msg='Install and Configure fiapstorage2 admin'
-    - apt: name=php7.0
-    - apt: name=php7.0-gd
-    - apt: name=php7.0-soap
-    - apt: name=php7.0-pgsql
+    - apt: name=php
+    - apt: name=php-gd
+    - apt: name=php-soap
+    - apt: name=php-pgsql
     - apt: name=libapache2-mod-php
     - file:
         state: absent
